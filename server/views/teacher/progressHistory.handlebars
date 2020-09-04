@@ -1,0 +1,47 @@
+{{!-- show history of progress sessions
+allow teachers to end session
+show button depending on date --}}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 style="font-family: Papyrus, cursive;">Progress History</h1>
+      <table class="table border">
+        <tr>
+          <th># Completed</th>
+          <th>Total #</th>
+          <th>% Completion</th>
+          <th>End Session</th>
+        </tr>
+        {{#each result}}
+          <tr>
+            <td>{{ this.checkedArray.length }}</td>
+            <td>{{ this.numPractices }}</td>
+            <td>{{ this.percentComplete }}%</td>
+            <td><button type="button" class="btn btn-danger btn-block" onclick="endSession('{{this._id}}')">End Session</button></td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function endSession(objectID) {
+    axios.put('/teacher/endProgressByID?id=' + objectID)
+    .then(function (response) {
+
+      if (response.status === 200) {
+        var data = response.data;
+        if (data === 'failed') {
+          alert('Failed to end session. Please try again.');
+        } else {
+          alert('Session ended succesfully!');
+        }
+      }
+    })
+    .catch(function (error) {
+      alert('Failed to end session. Please try again.');
+    });    
+  }
+</script>

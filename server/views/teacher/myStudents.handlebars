@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 style="font-family: Papyrus, cursive;">My Students</h1>
+      <table class="table border">
+        <tr>
+          <th>Name</th>
+          <th>Progress</th>
+          <th>Lessons</th>
+        </tr>
+        {{#each result}}
+          <tr>
+            <td><a href="/teacher/studentDetail?sid={{this._id}}">{{this.first}} {{this.last}}</a></td>
+            <td><a href="/teacher/progressHistory?sid={{this._id}}">{{this.progress}}</a></td>
+            <td><a href='/teacher/studentLessons?sid={{this._id}}'>Lessons</a></td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 style="font-family: Papyrus, cursive">Add New Student</h1>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputFirst">First name</label>
+        <input type="text" class="form-control" id="first" placeholder="Enter first name" value="">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputLast">Last name</label>
+        <input type="text" class="form-control" id="last" placeholder="Enter last name" value="">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputSecretCode1">Secret Code</label>
+        <input type="password" class="form-control" id="secret" placeholder="Enter secret code" value="">
+      </div>
+      <div class="form-group">
+        {{#each result}}
+          <label class="checkbox-inline"><input type="checkbox" class="hobbies" value="{{this.name}}">&nbsp;{{this.name}}</label><br>
+        {{/each}}
+      </div>
+
+      <button type="submit" class="btn btn-primary" onclick="submitNewStudent()">Submit</button>
+      <div class="form-group">
+        <p id="errorMessage" class="text-danger"></p>
+      </div>  
+      <div class="form-group">
+        <p id="successMessage" class="text-success"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function submitNewStudent() {
+    var tid = getUrlVars()["tid"];
+
+    var email = document.getElementById("email").value;
+    var first = document.getElementById("first").value;
+    var last = document.getElementById("last").value;
+    var secret = document.getElementById("secret").value;
+
+    var x = document.getElementsByClassName("hobbies");
+    var hobbies = new Array();
+
+    for (i = 0; i < x.length; i++) {
+      if (x[i].checked) {
+        hobbies.push(x[i].value);
+      }
+    }
+
+    var json = { data: {
+      email: email,
+      first: first,
+      last: last,
+      secret: secret,
+      hobbies: hobbies
+    }};
+
+    axios.post('/teacher/addStudent', json)
+    .then(function (response) {
+
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while creating student';
+        } else {
+          document.getElementById("email").value = '';
+          document.getElementById("first").value = '';
+          document.getElementById("last").value = '';
+          document.getElementById("secret").value = '';
+          document.getElementById('successMessage').innerHTML = 'Student created successfully';
+        }
+      }
+    })
+    .catch(function (error) {
+      document.getElementById('errorMessage').innerHTML = 'Error while creating student';
+    });    
+  }
+</script>

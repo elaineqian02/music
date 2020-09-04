@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 class="text-center" style="font-family: Papyrus, cursive">Welcome teachers!</h1>
+      <div class="text-center"><img src="/images/teachers.jpg" style="border-radius: 25px;"></div>
+      <br>
+      <form method="post" action="/teacher/login">
+        <div class="form-group">
+          {{!-- <a class="float-right" href='/teacher/signup'>Sign up</a> --}} 
+          <label for="email">Email address:</label>
+          <input type="email" class="form-control" id="email" name="email">
+        </div>
+        <div class="form-group">
+          <label for="secret">Password:</label>
+          <input type="password" class="form-control" name="secret" id="secret">
+        </div>
+        <div class="form-group">
+          <p id="errorMessage" class="text-danger"></p>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a class="btn btn-danger float-right" href="/">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  var error = getUrlVars()["error"];
+  if (error) {
+    document.getElementById("errorMessage").innerText = "Invalid user or password";
+  }
+</script>

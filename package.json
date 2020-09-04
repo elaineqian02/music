@@ -1,0 +1,22 @@
+{
+  "name": "music",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server"
+  },
+  "author": "Elaine",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.3.1",
+    "cookie-parser": "^1.4.4",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "handlebars": "^4.1.2",
+    "mongodb": "^3.2.7",
+    "pwa-helpers": "^0.9.1"
+  }
+}

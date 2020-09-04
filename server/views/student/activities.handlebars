@@ -1,0 +1,70 @@
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 style="font-family: Papyrus, cursive; padding-left:50px">Lessons for {{activities.[0].dueDate}}</h1>
+      <button class="btn btn-success" onclick="distributeActivities('{{activities.[0].dueDate}}')">Distribute</button>
+      <br>
+      <br>
+      <div class="form-group">
+        <table class="table border">
+          <tr>
+            <th>Due Date</th>
+            <th>Activity</th>
+            <th># Days</th>
+            <th># Reps</th>
+          </tr>
+          {{#each activities as | item i | }}
+          <tr>
+            <td>{{ this.dueDate }}</td>
+            <td>{{ this.activity }}</td>
+            <td>{{ this.days }}</td>
+            <td>{{ this.reps }}</td>
+          </tr>
+          {{/each}}
+        </table>
+        <div class="form-group">
+          <p id="errorMessage" class="text-danger"></p>
+        </div>
+        <div class="form-group" id="distributedContent">
+        </div>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sid = getUrlVars()["sid"];
+  function distributeActivities(dueDate) {
+
+    axios.post('/student/distributeActivities?sid=' + sid + '&dueDate=' + dueDate)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while distributing activities';
+        } else {
+          console.log(response.data);
+          var content = '<button type="button" class="btn btn-success" onclick="location.href=\'progress?sid=' + sid + '&dueDate=' + dueDate + '\'">Start</button>';
+          content += '<br>'
+          var dayActivities = response.data.dayActivities;
+          for (let i = 0; i < dayActivities.length; i ++) {
+            content += '<br>' + dayActivities[i].date.substring(0, 10) + '<br>';
+            for (let j = 0; j < dayActivities[i].activities.length; j ++) {
+              content += dayActivities[i].activities[j].activity + ' - ';
+              content += dayActivities[i].activities[j].reps + ' reps<br>';
+            }
+          }
+
+          document.getElementById('distributedContent').innerHTML = content;
+        }
+      }
+    })
+    .catch(function (error) {
+      alert(error);
+      document.getElementById('errorMessage').innerHTML = 'Error while distributing activities';
+    });    
+  }
+</script>

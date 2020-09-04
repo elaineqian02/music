@@ -1,0 +1,125 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-default float-left" onclick="location.href='/teacher/myStudents'"> </button>
+      <h1 style="font-family: Papyrus, cursive; padding-left:50px">Lessons for {{result.first}}</h1>
+      <div class="form-group">
+        <label for="InputDueDate">Due Date</label>
+        <input type="text" class="form-control" id="dueDate" aria-describedby="dueDateHelp" placeholder="mm/dd/yyyy">
+      </div>
+      <div class="form-group">
+        <label for="InputActivity">Activity</label>
+        <input type="text" class="form-control" id="activity" placeholder="eg. Practice A major scale">
+      </div>
+      <div class="form-group">
+        <label for="InputDays"># Days until due date</label>
+        <input type="number" class="form-control" id="days" placeholder="Enter # days">
+      </div>
+      <div class="form-group">
+        <label for="InputReps"># Reps per day</label>
+        <input type="number" class="form-control" id="reps" placeholder="Enter # reps">
+      </div>
+      <button class="btn btn-primary" onclick="addActivity()">Add</button>
+      <div class="form-group">
+        <p id="errorMessage" class="text-danger"></p>
+      </div>  
+      <div class="form-group">
+        <p id="successMessage" class="text-success"></p>
+      </div>
+
+      <div class="form-group">
+        <table class="table border">
+          <tr>
+            <th>Due Date</th>
+            <th>Activities</th>
+            <th># Days - # Reps</th>
+            <th>Delete</th>
+            <th></th>
+          </tr>
+          {{#each activities as |item i |}}
+            <tr>
+              <td>{{ this.dueDate }}</a></td>
+              <td>{{ this.activity }}</td>
+              <td>{{ this.days }} - {{ this.reps }}</td>
+              <td><button class="btn btn-danger" onclick="deleteStudentActivity('{{this._id}}')">X</button></td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sid = getUrlVars()["sid"];
+  var today = nextweek();
+  document.getElementById("dueDate").value = today;
+
+  function nextweek(){
+      var today = new Date();
+      var nextweek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
+      var dd = nextweek.getDate();
+      var mm = nextweek.getMonth()+1; 
+      var yyyy = nextweek.getFullYear();
+
+      return mm+'/'+dd+'/'+yyyy;
+  }
+
+
+  function addActivity() {
+
+    var dueDate = document.getElementById("dueDate").value;
+    var activity = document.getElementById("activity").value;
+    var days = parseInt(document.getElementById("days").value);
+    var reps = parseInt(document.getElementById("reps").value);
+    var lessons = new Array();
+
+    var json = { data: {
+      sid: sid,
+      dueDate: dueDate,
+      activity: activity,
+      days: days,
+      reps: reps,
+    }};
+
+    axios.post('/teacher/addStudentActivity?sid=' + sid, json)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while adding activity';
+        } else {
+          document.getElementById('successMessage').innerHTML = 'Student activity added successfully';
+          location.href = '/teacher/studentLessons?sid=' + sid;
+        }
+      }
+    })
+    .catch(function (error) {
+      document.getElementById('errorMessage').innerHTML = 'Error while adding activity';
+    });    
+  }
+
+  function deleteStudentActivity(id) {
+
+    if (!confirm("Confirm activity deletion?")) return false;
+
+    axios.delete('/teacher/deleteStudentActivity?id=' + id)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while deleting activity';
+        } else {
+          document.getElementById('successMessage').innerHTML = 'Activity deleted successfully';
+          location.href = '/teacher/studentLessons?sid=' + sid;
+        }
+      }
+    })
+    .catch(function (error) {
+      alert(error);
+      document.getElementById('errorMessage').innerHTML = 'Error while deleting activity';
+    });    
+  }
+</script>

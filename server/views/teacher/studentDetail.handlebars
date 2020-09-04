@@ -1,0 +1,105 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-default float-left" onclick="location.href='/teacher/myStudents'"> </button>
+      <h1 style="font-family: Papyrus, cursive; padding-left:50px">Edit Student</h1>
+      <div class="form-group">
+        <label for="InputEmail">Email address</label>
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{result.email}}">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+      </div>
+      <div class="form-group">
+        <label for="InputFirst">First name</label>
+        <input type="text" class="form-control" id="first" placeholder="Enter first name" value="{{result.first}}">
+      </div>
+      <div class="form-group">
+        <label for="InputLast">Last name</label>
+        <input type="text" class="form-control" id="last" placeholder="Enter last name" value="{{result.last}}">
+      </div>
+      <div class="form-group">
+        <label for="InputSecretCode">Secret Code</label>
+        <input type="password" class="form-control" id="secret" placeholder="Enter secret code" value="{{result.secret}}">
+      </div>
+      <div class="form-group">
+        {{#each hobbies}}
+          <label class="checkbox-inline"><input type="checkbox" class="hobbies" {{ this.checked }} value="{{this.name}}">&nbsp;{{this.name}}</label><br>
+        {{/each}}
+      </div>
+      <button class="btn btn-primary" onclick="editStudent()">Update</button>
+      <button class="btn btn-danger float-right" onclick="deleteStudent()">Delete</button>
+      <div class="form-group">
+        <p id="errorMessage" class="text-danger"></p>
+      </div>  
+      <div class="form-group">
+        <p id="successMessage" class="text-success"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function editStudent() {
+    var sid = getUrlVars()["sid"];
+
+    var email = document.getElementById("email").value;
+    var first = document.getElementById("first").value;
+    var last = document.getElementById("last").value;
+    var secret = document.getElementById("secret").value;
+    var x = document.getElementsByClassName("hobbies");
+    var hobbies = new Array();
+
+    for (i = 0; i < x.length; i++) {
+      if (x[i].checked) {
+        hobbies.push(x[i].value);
+      }
+    }
+
+    var json = { data: {
+      email: email,
+      first: first,
+      last: last,
+      secret: secret,
+      hobbies: hobbies
+    }};
+
+    axios.put('/teacher/updateStudent?sid=' + sid, json)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while updating student';
+        } else {
+          document.getElementById('successMessage').innerHTML = 'Student updated successfully';
+        }
+      }
+    })
+    .catch(function (error) {
+      document.getElementById('errorMessage').innerHTML = 'Error while updating student';
+    });    
+  }
+
+  function deleteStudent() {
+
+    if (!confirm("Confirm student deletion?")) return false;
+    
+    var sid = getUrlVars()["sid"];
+    axios.delete('/teacher/deleteStudent?sid=' + sid)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while deleting student';
+        } else {
+          document.getElementById('successMessage').innerHTML = 'Student deleted successfully';l
+          ocation.href = '/teacher/myStudents';
+        }
+      }
+    })
+    .catch(function (error) {
+      document.getElementById('errorMessage').innerHTML = 'Error while deleting student';
+    });    
+
+  }
+</script>

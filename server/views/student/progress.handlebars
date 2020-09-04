@@ -1,0 +1,102 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 style="font-family: Papyrus, cursive">Activites due {{progress.dueDate}}</h1>
+      <div class="form-group">
+        <table class="table border">
+          <tr>
+            <th>Date</th>
+            <th>Activity - Reps</th>
+          </tr>
+          {{#each progress.dayActivities }}
+          <tr>
+            <td>{{ this.date }}</td>
+            <td>
+              <table class="table table-borderless">
+                {{#each this.activities }}
+                <tr>
+                  <td>{{ this.activity}} - {{ this.reps}}</td>
+                  <td><input type="checkbox" id="checkbox_{{this.index}}" onclick="updateProgressIndex('{{this.index}}')"></td>
+                </tr>
+                {{/each}}
+              </table>
+            </td>
+          </tr>
+          {{/each}}
+        </table>
+        <div class="form-group">
+          <p id="errorMessage" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+          <p id="successMessage" class="text-success"></p>
+        </div>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="hidden" id="checkedArray" value="{{progress.checkedArray}}">
+<script>
+  const sid = getUrlVars()["sid"];
+  const dueDate = getUrlVars()["dueDate"];
+
+  var checkedArray = document.getElementById("checkedArray").value;
+  if (checkedArray !== "") {
+    checkedArray = document.getElementById("checkedArray").value.split(',');
+    for (let i = 0; i < checkedArray.length; i ++) {
+      document.getElementById('checkbox_' + checkedArray[i]).checked = true;
+    }
+  }
+
+  function endSession(dueDate) {
+    axios.post('/student/progress/end?sid=' + sid + '&dueDate=' + dueDate)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while ending this session';
+        } else {
+          location.href = '/student/activities?sid=' + sid;
+        }
+      }
+    })
+    .catch(function (error) {
+      alert(error);
+      document.getElementById('errorMessage').innerHTML = 'Error while distributing activities';
+    });    
+
+  }
+  function updateProgressIndex(index) {
+
+    var action = 'add';
+    if (!document.getElementById('checkbox_' + index).checked) {
+      action = 'delete';
+    }
+
+    var json = { data: {
+      sid: sid,
+      dueDate: dueDate,
+      index: index,
+      action: action
+    }};
+    
+    axios.post('/student/progress/set', json)
+    .then(function (response) {
+      if (response.status === 200) {
+        var data = response.data;
+
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while updating progress';
+        } else {
+          document.getElementById('successMessage').innerHTML = 'Successfully updated progress';
+        }
+      }
+    })
+    .catch(function (error) {
+      alert(error);
+      document.getElementById('errorMessage').innerHTML = 'Error while updating progress';
+    });    
+  }
+
+</script>

@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 class="text-center" style="font-family: Papyrus, cursive">Welcome students!</h1>
+      <div class="text-center"><img src="/images/students.jpg" style="border-radius: 25px;"></div>
+      <br>
+      <div class="form-group">
+        <label for="email">Email address:</label>
+        <input type="email" class="form-control" id="email" name="email">
+      </div>
+      <div class="form-group">
+        <label for="secret">Password:</label>
+        <input type="password" class="form-control" id="secret" name="secret">
+      </div>
+      <div class="form-group">
+        <p id="errorMessage" class="text-danger"></p>
+      </div>
+      <button class="btn btn-primary" onclick="submitLogin()">Submit</button>
+      <a class="btn btn-danger float-right" href="/">Cancel</a>      
+    </div>
+  </div>
+</div>
+
+<script>
+  function submitLogin() {
+    var email = document.getElementById("email").value;
+    var secret = document.getElementById("secret").value;
+
+    var json = { data: {
+      email: email,
+      secret: secret
+    }};
+
+    axios.post('/student/login', json)
+    .then(function (response) {
+
+      if (response.status === 200) {
+        var data = response.data;
+        if (data === 'failed') {
+          document.getElementById('errorMessage').innerHTML = 'Error while logging in';
+        } else {
+          location.href = '/student/activities?sid=' + data;
+        }
+      }
+    })
+    .catch(function (error) {
+      document.getElementById('errorMessage').innerHTML = "Invalid user or password";
+    });    
+  }
+</script>
